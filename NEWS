@@ -1,0 +1,45 @@
+# CGRphylo2 0.99.0
+
+## New Features
+
+* Initial Bioconductor submission
+* Implemented core CGR (Chaos Game Representation) algorithm
+* Added cgat() function for frequency matrix calculation
+* Added cgrplot() function for CGR visualization
+* Implemented multiple distance metrics (Euclidean, Manhattan, Squared Euclidean)
+* Added parallelCGR() for efficient parallel processing
+* Export functions for MEGA and PHYLIP formats
+* Comprehensive vignette with examples
+* Full test suite with testthat
+
+## Functions
+
+* `cgat()` - Calculate CGR frequency matrices
+* `cgrplot()` - Generate CGR plot coordinates
+* `matrixDistance()` - Calculate pairwise distances
+* `calculateDistanceMatrix()` - Compute full distance matrix
+* `fastafile_new()` - Filter sequences by N content
+* `create_meta()` - Extract sequence metadata
+* `saveMegaDistance()` - Export to MEGA format
+* `savePhylipDistance()` - Export to PHYLIP format
+* `parallelCGR()` - Parallel frequency matrix calculation
+
+## Documentation
+
+* Comprehensive package vignette
+* Detailed function documentation with examples
+* README with quick start guide
+* Citation information
+
+## Performance
+
+* 5-13.7× faster than Clustal-Omega for phylogenetic analysis
+* Linear scaling with sequence count
+* Efficient memory usage
+* Parallel processing support
+
+## Compatibility
+
+* Bioconductor 3.19+
+* R >= 4.4.0
+* Integration with ape, seqinr, and other phylogenetics packages
