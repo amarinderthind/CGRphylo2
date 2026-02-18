@@ -23,7 +23,8 @@ A matrix containing the frequencies of all possible k-mers for the
 \description{
 This function computes the Chaos Game Representation (CGR) frequency matrix
 for a given DNA sequence at a specified k-mer length. The CGR approach is an
-alignment-free method that represents genomic sequences as frequency matrices,
+alignment-free method that represents genomic sequences
+ as frequency matrices,
 which can then be used for phylogenetic analysis and sequence comparison.
 }
 \details{
@@ -36,10 +37,26 @@ cost of adding a new sequence is just one frequency matrix calculation, unlike
 multiple sequence alignment where the cost increases quadratically.
 }
 \examples{
-\dontrun{
-# Assuming fasta_filtered is loaded
-freq_matrix <- cgat(k_mer = 6, seq_index = 1, len_trim = 29000)
-}
+# Create simple test sequences
+test_sequences <- list(
+    seq1 = "ATCGATCGATCGATCG",
+    seq2 = "GCTAGCTAGCTAGCTA"
+)
+
+# Set up global variable (required by cgat)
+assign("fasta_filtered", test_sequences, envir = .GlobalEnv)
+
+# Calculate CGR frequency matrix for first sequence
+freq_matrix <- cgat(k_mer = 3, seq_index = 1, len_trim = 16)
+
+# View dimensions (should be 4^3 = 64 possible 3-mers)
+dim(freq_matrix)
+
+# Check that frequencies sum to 1 (normalized)
+sum(freq_matrix)
+
+# Clean up
+rm(fasta_filtered, envir = .GlobalEnv)
 
 }
 \references{

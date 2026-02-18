@@ -43,10 +43,11 @@ Corner assignments (standard):
 cgr_coords <- cgrplot(1)
 
 # Plot the CGR
-plot(cgr_coords[,1], cgr_coords[,2],
-     main = "CGR Plot",
-     xlab = "", ylab = "",
-     cex = 0.2, pch = 4)
+plot(cgr_coords[, 1], cgr_coords[, 2],
+  main = "CGR Plot",
+  xlab = "", ylab = "",
+  cex = 0.2, pch = 4
+)
 }
 
 }

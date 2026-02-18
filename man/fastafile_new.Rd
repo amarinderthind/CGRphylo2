@@ -24,10 +24,15 @@ Sequences with excessive ambiguous bases can affect the accuracy of distance
 calculations and tree construction.
 }
 \examples{
-\dontrun{
-library(seqinr)
-fasta <- read.fasta("sequences.fasta", seqtype = "DNA", as.string = TRUE)
-filtered_fasta <- fastafile_new(fasta, N_filter = 50)
-}
+# Create test sequences with N bases
+test_seqs <- list(
+    good_seq = "ATCGATCG",
+    bad_seq = "ATCGNNNNNATCG",
+    okay_seq = "ATCGNNATCG"
+)
+
+# Filter sequences with more than 3 N's
+filtered <- fastafile_new(test_seqs, N_filter = 3)
+length(filtered)  # Should be 2
 
 }

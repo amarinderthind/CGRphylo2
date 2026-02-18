@@ -23,10 +23,15 @@ This function provides useful summary statistics for quality control and
 understanding sequence characteristics before phylogenetic analysis.
 }
 \examples{
-\dontrun{
-library(seqinr)
-fasta <- read.fasta("sequences.fasta", seqtype = "DNA", as.string = TRUE)
-meta <- create_meta(fasta, N_filter = 50)
-}
+# Create test sequences
+test_seqs <- list(
+    seq1 = "ATCGATCGATCG",
+    seq2 = "GCTAGCTAGCTA",
+    seq3 = "AAAATTTTCCCCGGGG"
+)
+
+# Get metadata
+meta <- create_meta(test_seqs, N_filter = 50)
+print(meta)
 
 }

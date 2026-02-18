@@ -13,8 +13,10 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
-                      fig.width = 7, fig.height = 5)
+knitr::opts_chunk$set(
+  echo = TRUE, warning = FALSE, message = FALSE,
+  fig.width = 7, fig.height = 5
+)
 ```
 
 # Introduction
@@ -50,8 +52,9 @@ If you use CGRphylo in your research, please cite:
 ## Bioconductor Installation (recommended)
 
 ```{r eval=FALSE}
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
+if (!require("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager")
+}
 
 BiocManager::install("CGRphylo2")
 ```
@@ -60,8 +63,9 @@ BiocManager::install("CGRphylo2")
 
 ```{r eval=FALSE}
 # Install from GitHub
-if (!require("devtools", quietly = TRUE))
-    install.packages("devtools")
+if (!require("devtools", quietly = TRUE)) {
+  install.packages("devtools")
+}
 
 devtools::install_github("amarinderthind/CGRphylo2")
 ```
@@ -82,10 +86,11 @@ library(ape)
 
 ```{r load_data, eval=FALSE}
 # Read FASTA file
-fastafile <- seqinr::read.fasta("Input_recom_SARS_cov2.fasta", 
-                                seqtype = "DNA", 
-                                as.string = TRUE,
-                                set.attributes = FALSE)
+fastafile <- seqinr::read.fasta("Input_recom_SARS_cov2.fasta",
+  seqtype = "DNA",
+  as.string = TRUE,
+  set.attributes = FALSE
+)
 
 # Filter sequences with too many N bases
 N_filter <- 50
@@ -105,17 +110,19 @@ k_mer <- 6
 len_trim <- min(meta$length)
 
 # Parallel processing (recommended for large datasets)
-freq_matrices <- parallelCGR(fasta_filtered, 
-                             k_mer = k_mer, 
-                             len_trim = len_trim)
+freq_matrices <- parallelCGR(fasta_filtered,
+  k_mer = k_mer,
+  len_trim = len_trim
+)
 ```
 
 ## Calculate Distance Matrix
 
 ```{r calculate_distances, eval=FALSE}
 # Calculate pairwise distances
-distance_matrix <- calculateDistanceMatrix(freq_matrices, 
-                                          distance_type = "Euclidean")
+distance_matrix <- calculateDistanceMatrix(freq_matrices,
+  distance_type = "Euclidean"
+)
 
 # View a subset
 print(distance_matrix[1:5, 1:5])
@@ -162,16 +169,18 @@ print(paste("SD length:", sd(meta$length)))
 print(paste("Range:", paste(range(meta$length), collapse = " - ")))
 
 # Visualize length distribution
-dotchart(meta$length, 
-         labels = meta$name,
-         xlab = "Sequence length",
-         pch = 21, bg = "green", pt.cex = 1, cex = 0.7)
+dotchart(meta$length,
+  labels = meta$name,
+  xlab = "Sequence length",
+  pch = 21, bg = "green", pt.cex = 1, cex = 0.7
+)
 
 # Check GC content
 dotchart(meta$GC_content,
-         labels = meta$name,
-         xlab = "GC content (%)",
-         pch = 21, bg = "blue", pt.cex = 1, cex = 0.7)
+  labels = meta$name,
+  xlab = "GC content (%)",
+  pch = 21, bg = "blue", pt.cex = 1, cex = 0.7
+)
 ```
 
 ### Filtering by Strain (Optional)
@@ -184,10 +193,10 @@ meta$strains <- sapply(strsplit(meta$name, "_"), `[`, 1)
 
 # Visualize by strain
 ggplot(meta, aes(x = strains, y = length, color = strains)) +
-    geom_boxplot() +
-    coord_flip() +
-    ylab("Sequence length") +
-    theme_minimal()
+  geom_boxplot() +
+  coord_flip() +
+  ylab("Sequence length") +
+  theme_minimal()
 ```
 
 ## 2. CGR Visualization
@@ -198,9 +207,10 @@ Visualize the Chaos Game Representation for individual sequences:
 # Single CGR plot
 cgr_coords <- cgrplot(1)
 plot(cgr_coords[, 1], cgr_coords[, 2],
-     main = paste("CGR of", names(fasta_filtered)[1]),
-     xlab = "", ylab = "",
-     cex = 0.2, pch = 4)
+  main = paste("CGR of", names(fasta_filtered)[1]),
+  xlab = "", ylab = "",
+  cex = 0.2, pch = 4
+)
 
 # Compare two sequences
 par(mfrow = c(1, 2))
@@ -208,12 +218,14 @@ cgr1 <- cgrplot(1)
 cgr2 <- cgrplot(2)
 
 plot(cgr1[, 1], cgr1[, 2],
-     main = names(fasta_filtered)[1],
-     cex = 0.3, pch = 4, col = "blue")
+  main = names(fasta_filtered)[1],
+  cex = 0.3, pch = 4, col = "blue"
+)
 
 plot(cgr2[, 1], cgr2[, 2],
-     main = names(fasta_filtered)[2],
-     cex = 0.3, pch = 4, col = "red")
+  main = names(fasta_filtered)[2],
+  cex = 0.3, pch = 4, col = "red"
+)
 ```
 
 ## 3. Distance Calculation Methods
@@ -222,16 +234,19 @@ CGRphylo supports multiple distance metrics:
 
 ```{r distance_methods, eval=FALSE}
 # Euclidean distance (default, recommended)
-dist_euclidean <- calculateDistanceMatrix(freq_matrices, 
-                                         distance_type = "Euclidean")
+dist_euclidean <- calculateDistanceMatrix(freq_matrices,
+  distance_type = "Euclidean"
+)
 
 # Manhattan distance
 dist_manhattan <- calculateDistanceMatrix(freq_matrices,
-                                         distance_type = "Manhattan")
+  distance_type = "Manhattan"
+)
 
 # Squared Euclidean distance
 dist_sq_euclidean <- calculateDistanceMatrix(freq_matrices,
-                                            distance_type = "S_Euclidean")
+  distance_type = "S_Euclidean"
+)
 ```
 
 ## 4. Choosing K-mer Size
@@ -244,22 +259,23 @@ k_values <- c(4, 5, 6, 7)
 trees <- list()
 
 for (k in k_values) {
-    # Calculate frequencies
-    freq <- parallelCGR(fasta_filtered, k_mer = k, len_trim = len_trim)
-    
-    # Calculate distances
-    dist <- calculateDistanceMatrix(freq, distance_type = "Euclidean")
-    
-    # Build tree
-    trees[[paste0("k", k)]] <- nj(as.dist(dist))
+  # Calculate frequencies
+  freq <- parallelCGR(fasta_filtered, k_mer = k, len_trim = len_trim)
+
+  # Calculate distances
+  dist <- calculateDistanceMatrix(freq, distance_type = "Euclidean")
+
+  # Build tree
+  trees[[paste0("k", k)]] <- nj(as.dist(dist))
 }
 
 # Compare trees
 par(mfrow = c(2, 2))
 for (k in k_values) {
-    plot(trees[[paste0("k", k)]], 
-         main = paste("k =", k),
-         cex = 0.7)
+  plot(trees[[paste0("k", k)]],
+    main = paste("k =", k),
+    cex = 0.7
+  )
 }
 ```
 
@@ -297,16 +313,18 @@ For large datasets, use parallel processing:
 
 ```{r parallel_processing, eval=FALSE}
 # Automatic core detection
-freq_matrices <- parallelCGR(fasta_filtered, 
-                             k_mer = 6, 
-                             len_trim = len_trim,
-                             num_cores = NULL)  # Uses detectCores() - 1
+freq_matrices <- parallelCGR(fasta_filtered,
+  k_mer = 6,
+  len_trim = len_trim,
+  num_cores = NULL
+) # Uses detectCores() - 1
 
 # Manual core specification
 freq_matrices <- parallelCGR(fasta_filtered,
-                             k_mer = 6,
-                             len_trim = len_trim,
-                             num_cores = 4)
+  k_mer = 6,
+  len_trim = len_trim,
+  num_cores = 4
+)
 ```
 
 ## Memory Optimization
@@ -322,13 +340,13 @@ n_batches <- ceiling(n_sequences / batch_size)
 all_freq_matrices <- list()
 
 for (i in seq_len(n_batches)) {
-    start_idx <- (i - 1) * batch_size + 1
-    end_idx <- min(i * batch_size, n_sequences)
-    
-    batch_seqs <- fasta_filtered[start_idx:end_idx]
-    batch_freq <- parallelCGR(batch_seqs, k_mer = 6, len_trim = len_trim)
-    
-    all_freq_matrices <- c(all_freq_matrices, batch_freq)
+  start_idx <- (i - 1) * batch_size + 1
+  end_idx <- min(i * batch_size, n_sequences)
+
+  batch_seqs <- fasta_filtered[start_idx:end_idx]
+  batch_freq <- parallelCGR(batch_seqs, k_mer = 6, len_trim = len_trim)
+
+  all_freq_matrices <- c(all_freq_matrices, batch_freq)
 }
 ```
 

@@ -31,9 +31,18 @@ The Euclidean distance is most commonly used, but Manhattan and squared
 Euclidean distances are also available for specific applications.
 }
 \examples{
-\dontrun{
-# Calculate Euclidean distance between two sequences
-dist <- matrixDistance(freq_mat1, freq_mat2, distance_type = "Euclidean")
-}
+# Create two simple frequency matrices
+matrix1 <- matrix(c(0.1, 0.2, 0.3, 0.4), ncol = 1)
+matrix2 <- matrix(c(0.15, 0.25, 0.25, 0.35), ncol = 1)
+
+# Calculate Euclidean distance
+dist_euclidean <- matrixDistance(matrix1, matrix2, 
+                                  distance_type = "Euclidean")
+print(dist_euclidean)
+
+# Calculate Manhattan distance
+dist_manhattan <- matrixDistance(matrix1, matrix2, 
+                                  distance_type = "Manhattan")
+print(dist_manhattan)
 
 }

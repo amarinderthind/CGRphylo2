@@ -28,8 +28,9 @@ phylogenetic tree construction, clustering, or other downstream analyses.
 \examples{
 \dontrun{
 # Assuming freq_matrices is a list of frequency matrices
-dist_matrix <- calculateDistanceMatrix(freq_matrices, 
-                                       distance_type = "Euclidean")
+dist_matrix <- calculateDistanceMatrix(freq_matrices,
+  distance_type = "Euclidean"
+)
 }
 
 }

@@ -5,7 +5,8 @@ utils::globalVariables(c("fasta_filtered"))
 #'
 #' This function computes the Chaos Game Representation (CGR) frequency matrix
 #' for a given DNA sequence at a specified k-mer length. The CGR approach is an
-#' alignment-free method that represents genomic sequences as frequency matrices,
+#' alignment-free method that represents genomic sequences
+#'  as frequency matrices,
 #' which can then be used for phylogenetic analysis and sequence comparison.
 #'
 #' @param k_mer Integer. The word length (k-mer size) for frequency calculation.
@@ -28,10 +29,26 @@ utils::globalVariables(c("fasta_filtered"))
 #' multiple sequence alignment where the cost increases quadratically.
 #'
 #' @examples
-#' \dontrun{
-#' # Assuming fasta_filtered is loaded
-#' freq_matrix <- cgat(k_mer = 6, seq_index = 1, len_trim = 29000)
-#' }
+#' # Create simple test sequences
+#' test_sequences <- list(
+#'     seq1 = "ATCGATCGATCGATCG",
+#'     seq2 = "GCTAGCTAGCTAGCTA"
+#' )
+#' 
+#' # Set up global variable (required by cgat)
+#' assign("fasta_filtered", test_sequences, envir = .GlobalEnv)
+#' 
+#' # Calculate CGR frequency matrix for first sequence
+#' freq_matrix <- cgat(k_mer = 3, seq_index = 1, len_trim = 16)
+#' 
+#' # View dimensions (should be 4^3 = 64 possible 3-mers)
+#' dim(freq_matrix)
+#' 
+#' # Check that frequencies sum to 1 (normalized)
+#' sum(freq_matrix)
+#' 
+#' # Clean up
+#' rm(fasta_filtered, envir = .GlobalEnv)
 #'
 #' @references
 #' Thind AS, Sinha S (2023). Using Chaos-Game-Representation for Analysing the
@@ -40,48 +57,48 @@ utils::globalVariables(c("fasta_filtered"))
 #'
 #' @export
 cgat <- function(k_mer, seq_index, len_trim) {
-    # Get the sequence from the global fasta_filtered object
-    sequence <- fasta_filtered[[seq_index]]
-    
-    # Trim sequence to specified length
-    sequence <- substr(sequence, 1, len_trim)
-    
-    # Convert to uppercase
-    sequence <- toupper(sequence)
-    
-    # Remove any non-ACGT characters
-    sequence <- gsub("[^ACGT]", "", sequence)
-    
-    # Calculate total number of possible k-mers (4^k)
-    n_kmers <- 4^k_mer
-    
-    # Generate all possible k-mers
-    bases <- c("A", "C", "G", "T")
-    all_kmers <- expand.grid(rep(list(bases), k_mer))
-    all_kmers <- apply(all_kmers, 1, paste, collapse = "")
-    
-    # Initialize frequency matrix
-    freq_matrix <- matrix(0, nrow = n_kmers, ncol = 1)
-    rownames(freq_matrix) <- all_kmers
-    
-    # Count k-mer frequencies
-    seq_length <- nchar(sequence)
-    if (seq_length >= k_mer) {
-        for (i in 1:(seq_length - k_mer + 1)) {
-            kmer <- substr(sequence, i, i + k_mer - 1)
-            if (kmer %in% all_kmers) {
-                freq_matrix[kmer, 1] <- freq_matrix[kmer, 1] + 1
-            }
-        }
-        
-        # Normalize frequencies
-        total_kmers <- sum(freq_matrix)
-        if (total_kmers > 0) {
-            freq_matrix <- freq_matrix / total_kmers
-        }
+  # Get the sequence from the global fasta_filtered object
+  sequence <- fasta_filtered[[seq_index]]
+  
+  # Trim sequence to specified length
+  sequence <- substr(sequence, 1, len_trim)
+  
+  # Convert to uppercase
+  sequence <- toupper(sequence)
+  
+  # Remove any non-ACGT characters
+  sequence <- gsub("[^ACGT]", "", sequence)
+  
+  # Calculate total number of possible k-mers (4^k)
+  n_kmers <- 4^k_mer
+  
+  # Generate all possible k-mers
+  bases <- c("A", "C", "G", "T")
+  all_kmers <- expand.grid(rep(list(bases), k_mer))
+  all_kmers <- apply(all_kmers, 1, paste, collapse = "")
+  
+  # Initialize frequency matrix
+  freq_matrix <- matrix(0, nrow = n_kmers, ncol = 1)
+  rownames(freq_matrix) <- all_kmers
+  
+  # Count k-mer frequencies
+  seq_length <- nchar(sequence)
+  if (seq_length >= k_mer) {
+    for (i in 1:(seq_length - k_mer + 1)) {
+      kmer <- substr(sequence, i, i + k_mer - 1)
+      if (kmer %in% all_kmers) {
+        freq_matrix[kmer, 1] <- freq_matrix[kmer, 1] + 1
+      }
     }
     
-    return(freq_matrix)
+    # Normalize frequencies
+    total_kmers <- sum(freq_matrix)
+    if (total_kmers > 0) {
+      freq_matrix <- freq_matrix / total_kmers
+    }
+  }
+  
+  return(freq_matrix)
 }
 
 
@@ -107,23 +124,32 @@ cgat <- function(k_mer, seq_index, len_trim) {
 #' Euclidean distances are also available for specific applications.
 #'
 #' @examples
-#' \dontrun{
-#' # Calculate Euclidean distance between two sequences
-#' dist <- matrixDistance(freq_mat1, freq_mat2, distance_type = "Euclidean")
-#' }
+#' # Create two simple frequency matrices
+#' matrix1 <- matrix(c(0.1, 0.2, 0.3, 0.4), ncol = 1)
+#' matrix2 <- matrix(c(0.15, 0.25, 0.25, 0.35), ncol = 1)
+#' 
+#' # Calculate Euclidean distance
+#' dist_euclidean <- matrixDistance(matrix1, matrix2, 
+#'                                   distance_type = "Euclidean")
+#' print(dist_euclidean)
+#' 
+#' # Calculate Manhattan distance
+#' dist_manhattan <- matrixDistance(matrix1, matrix2, 
+#'                                   distance_type = "Manhattan")
+#' print(dist_manhattan)
 #'
 #' @export
 matrixDistance <- function(matrix1, matrix2, distance_type = "Euclidean") {
-    if (distance_type == "Euclidean") {
-        dist <- sqrt(sum((matrix1 - matrix2)^2))
-    } else if (distance_type == "S_Euclidean") {
-        dist <- sum((matrix1 - matrix2)^2)
-    } else if (distance_type == "Manhattan") {
-        dist <- sum(abs(matrix1 - matrix2))
-    } else {
-        stop("Invalid distance_type. Choose 'Euclidean', 'S_Euclidean', or 'Manhattan'")
-    }
-    return(dist)
+  if (distance_type == "Euclidean") {
+    dist <- sqrt(sum((matrix1 - matrix2)^2))
+  } else if (distance_type == "S_Euclidean") {
+    dist <- sum((matrix1 - matrix2)^2)
+  } else if (distance_type == "Manhattan") {
+    dist <- sum(abs(matrix1 - matrix2))
+  } else {
+    stop("Invalid distance_type. Choose 'Euclidean', 'S_Euclidean', or 'Manhattan'")
+  }
+  return(dist)
 }
 
 
@@ -143,26 +169,33 @@ matrixDistance <- function(matrix1, matrix2, distance_type = "Euclidean") {
 #' calculations and tree construction.
 #'
 #' @examples
-#' \dontrun{
-#' library(seqinr)
-#' fasta <- read.fasta("sequences.fasta", seqtype = "DNA", as.string = TRUE)
-#' filtered_fasta <- fastafile_new(fasta, N_filter = 50)
-#' }
+#' # Create test sequences with N bases
+#' test_seqs <- list(
+#'     good_seq = "ATCGATCG",
+#'     bad_seq = "ATCGNNNNNATCG",
+#'     okay_seq = "ATCGNNATCG"
+#' )
+#' 
+#' # Filter sequences with more than 3 N's
+#' filtered <- fastafile_new(test_seqs, N_filter = 3)
+#' length(filtered)  # Should be 2
 #'
 #' @export
 fastafile_new <- function(fastafile, N_filter) {
-    # Count N's in each sequence
-    n_counts <- sapply(fastafile, function(seq) {
-        length(grep("N", strsplit(toupper(seq), "")[[1]]))
-    })
-    
-    # Filter sequences
-    filtered <- fastafile[n_counts <= N_filter]
-    
-    message(paste("Filtered", length(fastafile) - length(filtered), 
-                  "sequences with >", N_filter, "N bases"))
-    
-    return(filtered)
+  # Count N's in each sequence
+  n_counts <- sapply(fastafile, function(seq) {
+    length(grep("N", strsplit(toupper(seq), "")[[1]]))
+  })
+  
+  # Filter sequences
+  filtered <- fastafile[n_counts <= N_filter]
+  
+  message(paste(
+    "Filtered", length(fastafile) - length(filtered),
+    "sequences with >", N_filter, "N bases"
+  ))
+  
+  return(filtered)
 }
 
 
@@ -181,29 +214,34 @@ fastafile_new <- function(fastafile, N_filter) {
 #' understanding sequence characteristics before phylogenetic analysis.
 #'
 #' @examples
-#' \dontrun{
-#' library(seqinr)
-#' fasta <- read.fasta("sequences.fasta", seqtype = "DNA", as.string = TRUE)
-#' meta <- create_meta(fasta, N_filter = 50)
-#' }
+#' # Create test sequences
+#' test_seqs <- list(
+#'     seq1 = "ATCGATCGATCG",
+#'     seq2 = "GCTAGCTAGCTA",
+#'     seq3 = "AAAATTTTCCCCGGGG"
+#' )
+#' 
+#' # Get metadata
+#' meta <- create_meta(test_seqs, N_filter = 50)
+#' print(meta)
 #'
 #' @export
 create_meta <- function(fastafile, N_filter) {
-    meta_df <- data.frame(
-        name = names(fastafile),
-        length = sapply(fastafile, nchar),
-        GC_content = sapply(fastafile, function(seq) {
-            bases <- strsplit(toupper(seq), "")[[1]]
-            gc_count <- sum(bases %in% c("G", "C"))
-            gc_count / length(bases) * 100
-        }),
-        N_content = sapply(fastafile, function(seq) {
-            bases <- strsplit(toupper(seq), "")[[1]]
-            n_count <- sum(bases == "N")
-            n_count
-        }),
-        stringsAsFactors = FALSE
-    )
-    
-    return(meta_df)
+  meta_df <- data.frame(
+    name = names(fastafile),
+    length = sapply(fastafile, nchar),
+    GC_content = sapply(fastafile, function(seq) {
+      bases <- strsplit(toupper(seq), "")[[1]]
+      gc_count <- sum(bases %in% c("G", "C"))
+      gc_count / length(bases) * 100
+    }),
+    N_content = sapply(fastafile, function(seq) {
+      bases <- strsplit(toupper(seq), "")[[1]]
+      n_count <- sum(bases == "N")
+      n_count
+    }),
+    stringsAsFactors = FALSE
+  )
+  
+  return(meta_df)
 }
