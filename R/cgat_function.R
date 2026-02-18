@@ -1,3 +1,6 @@
+# Avoid NOTE about global variables
+utils::globalVariables(c("fasta_filtered"))
+
 #' Calculate CGR frequency matrix for a DNA sequence
 #'
 #' This function computes the Chaos Game Representation (CGR) frequency matrix

@@ -6,29 +6,36 @@ Date: 2026-02-13
 Authors@R: person("Amarinder Singh", "Thind", 
                   email = "amarinder.thind@gmail.com",
                   role = c("aut", "cre"),
-                  comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: CGRphylo provides an efficient alignment-free approach for 
-    phylogenetic analysis of viral genomes using Chaos Game Representation (CGR). 
-    It accurately classifies closely related viral strains, including recombinants, 
-    making it particularly valuable during epidemic outbreaks where thousands of 
-    viral sequences need rapid analysis. The package processes genomic sequences 
-    significantly faster than traditional multiple sequence alignment methods 
-    (5-13.7x faster than Clustal-Omega), with computational cost that scales 
-    linearly rather than quadratically with dataset size. It is designed for both 
-    high and low-resource settings, creating frequency matrices for each sequence 
-    that can be used to calculate distances and construct phylogenetic trees.
+                  comment = c(ORCID = "0000-0003-4592-0380"))
+Description: Description: CGRphylo2 provides an alignment-free phylogenetic analysis method
+    for viral genomes using Chaos Game Representation (CGR), a technique based
+    on statistical physics concepts. Viruses exhibit high mutation rates,
+    facilitating rapid evolution and emergence of new species, subspecies,
+    strains, and recombinant forms. Accurate classification is crucial for
+    understanding viral evolution and therapeutic development. Traditional
+    phylogenetic methods require sequence alignment, which is computationally
+    intensive. CGRphylo2 addresses this by implementing CGR-based whole-genome
+    comparison that is fast, accurate, and computationally efficient. The
+    package successfully classifies closely related viral lineages (demonstrated
+    on SARS-CoV-2 lineages A and B), identifies recombinants (such as the XBB
+    variant), and distinguishes multiple strains simultaneously. It processes
+    sequences 5-13.7x faster than alignment-based methods (Clustal-Omega) with
+    linear computational scaling. As a k-mer based approach, it enables
+    simultaneous comparison of numerous closely-related sequences of different
+    lengths. The package creates frequency matrices for distance calculations
+    and phylogenetic tree construction, with outputs compatible with standard
+    formats (MEGA, PHYLIP, Newick). Methods are based on Thind and Sinha (2023)
+    <doi:10.2174/1389202924666230517115655>.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Depends:
     R (>= 4.4.0)
 Imports:
-    Biostrings,
     methods,
     stats,
     utils,
-    graphics,
-    parallel
+    graphics
 Suggests:
     BiocStyle,
     knitr,
@@ -45,5 +52,5 @@ biocViews: Phylogenetics, Genetics, SequenceMatching, Alignment,
     Clustering, Visualization, Software
 BugReports: https://github.com/amarinderthind/CGRphylo2/issues
 URL: https://github.com/amarinderthind/CGRphylo2
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.3
 Config/testthat/edition: 3

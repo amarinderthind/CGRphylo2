@@ -118,7 +118,7 @@ test_that("calculateDistanceMatrix produces symmetric matrix", {
     expect_equal(dist_matrix, t(dist_matrix))
     
     # Diagonal should be zero
-    expect_equal(diag(dist_matrix), c(0, 0, 0))
+    expect_equal(as.numeric(diag(dist_matrix)), c(0, 0, 0))
     
     # All values should be non-negative
     expect_true(all(dist_matrix >= 0))

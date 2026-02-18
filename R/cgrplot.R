@@ -1,3 +1,6 @@
+# Avoid NOTE about global variables
+utils::globalVariables(c("fasta_filtered"))
+
 #' Generate CGR plot coordinates for a DNA sequence
 #'
 #' Creates x and y coordinates for visualizing a Chaos Game Representation (CGR)
