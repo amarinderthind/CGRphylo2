@@ -21,6 +21,28 @@ knitr::opts_chunk$set(
 
 # Introduction
 
+### About CGRphylo2
+
+CGRphylo2 provides an alignment-free phylogenetic analysis method
+    for viral genomes using Chaos Game Representation (CGR), a technique based
+    on statistical physics concepts. Viruses exhibit high mutation rates,
+    facilitating rapid evolution and emergence of new species, subspecies,
+    strains, and recombinant forms. Accurate classification is crucial for
+    understanding viral evolution and therapeutic development. Traditional
+    phylogenetic methods require sequence alignment, which is computationally
+    intensive. CGRphylo2 addresses this by implementing CGR-based whole-genome
+    comparison that is fast, accurate, and computationally efficient. The
+    package successfully classifies closely related viral lineages (demonstrated
+    on SARS-CoV-2 lineages A and B), identifies recombinants (such as the XBB
+    variant), and distinguishes multiple strains simultaneously. It processes
+    sequences 5-13.7x faster than alignment-based methods (Clustal-Omega) with
+    linear computational scaling. As a k-mer based approach, it enables
+    simultaneous comparison of numerous closely-related sequences of different
+    lengths. The package creates frequency matrices for distance calculations
+    and phylogenetic tree construction, with outputs compatible with standard
+    formats (MEGA, PHYLIP, Newick). Earlier version refernce is Thind and Sinha (2023)
+    <doi:10.2174/1389202924666230517115655>.
+    
 ## Why CGRphylo?
 
 **CGRphylo2** provides an efficient alignment-free approach for phylogenetic analysis of viral genomes using Chaos Game Representation (CGR). The package offers several key advantages:
@@ -86,14 +108,14 @@ library(ape)
 
 ```{r load_data, eval=FALSE}
 # Read FASTA file
-fastafile <- seqinr::read.fasta("Input_recom_SARS_cov2.fasta",
+fastafile <- seqinr::read.fasta("example_sequences.fasta",
   seqtype = "DNA",
   as.string = TRUE,
   set.attributes = FALSE
 )
 
 # Filter sequences with too many N bases
-N_filter <- 50
+N_filter <- 50 #based on 30k bases genome
 fasta_filtered <- fastafile_new(fastafile, N_filter)
 
 # Create metadata

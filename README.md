@@ -7,6 +7,28 @@
 
 **CGRphylo2** provides an efficient alignment-free approach for phylogenetic analysis of viral genomes using Chaos Game Representation (CGR). It accurately classifies closely related viral strains, including recombinants, making it particularly valuable during epidemic outbreaks where thousands of viral sequences need rapid analysis.
 
+### About CGRphylo2
+
+CGRphylo2 provides an alignment-free phylogenetic analysis method
+    for viral genomes using Chaos Game Representation (CGR), a technique based
+    on statistical physics concepts. Viruses exhibit high mutation rates,
+    facilitating rapid evolution and emergence of new species, subspecies,
+    strains, and recombinant forms. Accurate classification is crucial for
+    understanding viral evolution and therapeutic development. Traditional
+    phylogenetic methods require sequence alignment, which is computationally
+    intensive. CGRphylo2 addresses this by implementing CGR-based whole-genome
+    comparison that is fast, accurate, and computationally efficient. The
+    package successfully classifies closely related viral lineages (demonstrated
+    on SARS-CoV-2 lineages A and B), identifies recombinants (such as the XBB
+    variant), and distinguishes multiple strains simultaneously. It processes
+    sequences 5-13.7x faster than alignment-based methods (Clustal-Omega) with
+    linear computational scaling. As a k-mer based approach, it enables
+    simultaneous comparison of numerous closely-related sequences of different
+    lengths. The package creates frequency matrices for distance calculations
+    and phylogenetic tree construction, with outputs compatible with standard
+    formats (MEGA, PHYLIP, Newick). Methods are based on Thind and Sinha (2023)
+    <doi:10.2174/1389202924666230517115655>.
+    
 ### Why CGRphylo?
 
 - ✨ **Precision**: Accurately classifies closely related viral strains and recombinants
