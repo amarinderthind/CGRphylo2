@@ -10,15 +10,17 @@ cgat(k_mer, seq_index, len_trim)
 \item{k_mer}{Integer. The word length (k-mer size) for frequency calculation.
 Typical values range from 4 to 8. Default is 6.}
 
-\item{seq_index}{Integer. The index of the sequence in the global fasta_filtered
-object to process.}
+\item{seq_index}{Integer. The index of the sequence in the global
+fasta_filtered object to process.}
 
 \item{len_trim}{Integer. The length to which sequences should be trimmed for
-consistent comparison. Usually set to the minimum sequence length in the dataset.}
+consistent comparison. Usually set to the minimum sequence length in the
+dataset.}
 }
 \value{
 A matrix containing the frequencies of all possible k-mers for the
-  given sequence. The matrix has 4^k rows corresponding to all possible k-mers.
+  given sequence. The matrix has 4^k rows corresponding to all possible
+  k-mers.
 }
 \description{
 This function computes the Chaos Game Representation (CGR) frequency matrix
@@ -28,13 +30,15 @@ alignment-free method that represents genomic sequences
 which can then be used for phylogenetic analysis and sequence comparison.
 }
 \details{
-The function creates a frequency matrix based on the CGR algorithm. Each k-mer's
-frequency is calculated from the DNA sequence, and the resulting matrix can be
-used to compute distances between sequences without requiring sequence alignment.
+The function creates a frequency matrix based on the CGR algorithm. Each
+k-mer's frequency is calculated from the DNA sequence, and the resulting
+matrix can be used to compute distances between sequences without requiring
+sequence alignment.
 
-The CGR method is particularly efficient for large datasets as the computational
-cost of adding a new sequence is just one frequency matrix calculation, unlike
-multiple sequence alignment where the cost increases quadratically.
+The CGR method is particularly efficient for large datasets as the
+computational cost of adding a new sequence is just one frequency matrix
+calculation, unlike multiple sequence alignment where the cost increases
+quadratically.
 }
 \examples{
 # Create simple test sequences
@@ -61,6 +65,6 @@ rm(fasta_filtered, envir = .GlobalEnv)
 }
 \references{
 Thind AS, Sinha S (2023). Using Chaos-Game-Representation for Analysing the
-SARS-CoV-2 Lineages, Newly Emerging Strains and Recombinants. Current Genomics,
-24(3). doi:10.2174/1389202924666230517115655
+SARS-CoV-2 Lineages, Newly Emerging Strains and Recombinants. Current
+Genomics, 24(3). doi:10.2174/1389202924666230517115655
 }

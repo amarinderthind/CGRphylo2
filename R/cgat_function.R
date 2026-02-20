@@ -11,22 +11,26 @@ utils::globalVariables(c("fasta_filtered"))
 #'
 #' @param k_mer Integer. The word length (k-mer size) for frequency calculation.
 #'   Typical values range from 4 to 8. Default is 6.
-#' @param seq_index Integer. The index of the sequence in the global fasta_filtered
-#'   object to process.
+#' @param seq_index Integer. The index of the sequence in the global
+#'   fasta_filtered object to process.
 #' @param len_trim Integer. The length to which sequences should be trimmed for
-#'   consistent comparison. Usually set to the minimum sequence length in the dataset.
+#'   consistent comparison. Usually set to the minimum sequence length in the
+#'   dataset.
 #'
 #' @return A matrix containing the frequencies of all possible k-mers for the
-#'   given sequence. The matrix has 4^k rows corresponding to all possible k-mers.
+#'   given sequence. The matrix has 4^k rows corresponding to all possible
+#'   k-mers.
 #'
 #' @details
-#' The function creates a frequency matrix based on the CGR algorithm. Each k-mer's
-#' frequency is calculated from the DNA sequence, and the resulting matrix can be
-#' used to compute distances between sequences without requiring sequence alignment.
+#' The function creates a frequency matrix based on the CGR algorithm. Each
+#' k-mer's frequency is calculated from the DNA sequence, and the resulting
+#' matrix can be used to compute distances between sequences without requiring
+#' sequence alignment.
 #'
-#' The CGR method is particularly efficient for large datasets as the computational
-#' cost of adding a new sequence is just one frequency matrix calculation, unlike
-#' multiple sequence alignment where the cost increases quadratically.
+#' The CGR method is particularly efficient for large datasets as the
+#' computational cost of adding a new sequence is just one frequency matrix
+#' calculation, unlike multiple sequence alignment where the cost increases
+#' quadratically.
 #'
 #' @examples
 #' # Create simple test sequences
@@ -34,26 +38,26 @@ utils::globalVariables(c("fasta_filtered"))
 #'     seq1 = "ATCGATCGATCGATCG",
 #'     seq2 = "GCTAGCTAGCTAGCTA"
 #' )
-#' 
+#'
 #' # Set up global variable (required by cgat)
 #' assign("fasta_filtered", test_sequences, envir = .GlobalEnv)
-#' 
+#'
 #' # Calculate CGR frequency matrix for first sequence
 #' freq_matrix <- cgat(k_mer = 3, seq_index = 1, len_trim = 16)
-#' 
+#'
 #' # View dimensions (should be 4^3 = 64 possible 3-mers)
 #' dim(freq_matrix)
-#' 
+#'
 #' # Check that frequencies sum to 1 (normalized)
 #' sum(freq_matrix)
-#' 
+#'
 #' # Clean up
 #' rm(fasta_filtered, envir = .GlobalEnv)
 #'
 #' @references
 #' Thind AS, Sinha S (2023). Using Chaos-Game-Representation for Analysing the
-#' SARS-CoV-2 Lineages, Newly Emerging Strains and Recombinants. Current Genomics,
-#' 24(3). doi:10.2174/1389202924666230517115655
+#' SARS-CoV-2 Lineages, Newly Emerging Strains and Recombinants. Current
+#' Genomics, 24(3). doi:10.2174/1389202924666230517115655
 #'
 #' @export
 cgat <- function(k_mer, seq_index, len_trim) {
@@ -84,7 +88,7 @@ cgat <- function(k_mer, seq_index, len_trim) {
   # Count k-mer frequencies
   seq_length <- nchar(sequence)
   if (seq_length >= k_mer) {
-    for (i in 1:(seq_length - k_mer + 1)) {
+    for (i in seq_len(seq_length - k_mer + 1)) {  # FIX: was 1:(seq_length - k_mer + 1)
       kmer <- substr(sequence, i, i + k_mer - 1)
       if (kmer %in% all_kmers) {
         freq_matrix[kmer, 1] <- freq_matrix[kmer, 1] + 1
@@ -127,15 +131,15 @@ cgat <- function(k_mer, seq_index, len_trim) {
 #' # Create two simple frequency matrices
 #' matrix1 <- matrix(c(0.1, 0.2, 0.3, 0.4), ncol = 1)
 #' matrix2 <- matrix(c(0.15, 0.25, 0.25, 0.35), ncol = 1)
-#' 
+#'
 #' # Calculate Euclidean distance
-#' dist_euclidean <- matrixDistance(matrix1, matrix2, 
-#'                                   distance_type = "Euclidean")
+#' dist_euclidean <- matrixDistance(matrix1, matrix2,
+#'                                  distance_type = "Euclidean")
 #' print(dist_euclidean)
-#' 
+#'
 #' # Calculate Manhattan distance
-#' dist_manhattan <- matrixDistance(matrix1, matrix2, 
-#'                                   distance_type = "Manhattan")
+#' dist_manhattan <- matrixDistance(matrix1, matrix2,
+#'                                  distance_type = "Manhattan")
 #' print(dist_manhattan)
 #'
 #' @export
@@ -147,6 +151,7 @@ matrixDistance <- function(matrix1, matrix2, distance_type = "Euclidean") {
   } else if (distance_type == "Manhattan") {
     dist <- sum(abs(matrix1 - matrix2))
   } else {
+    # FIX: was stop(paste("Invalid distance_type. Choose ..."))
     stop("Invalid distance_type. Choose 'Euclidean', 'S_Euclidean', or 'Manhattan'")
   }
   return(dist)
@@ -175,25 +180,26 @@ matrixDistance <- function(matrix1, matrix2, distance_type = "Euclidean") {
 #'     bad_seq = "ATCGNNNNNATCG",
 #'     okay_seq = "ATCGNNATCG"
 #' )
-#' 
+#'
 #' # Filter sequences with more than 3 N's
 #' filtered <- fastafile_new(test_seqs, N_filter = 3)
 #' length(filtered)  # Should be 2
 #'
 #' @export
 fastafile_new <- function(fastafile, N_filter) {
-  # Count N's in each sequence
-  n_counts <- sapply(fastafile, function(seq) {
+  # FIX: was sapply(); vapply() enforces return type integer(1) per element
+  n_counts <- vapply(fastafile, function(seq) {
     length(grep("N", strsplit(toupper(seq), "")[[1]]))
-  })
+  }, FUN.VALUE = integer(1))
   
   # Filter sequences
   filtered <- fastafile[n_counts <= N_filter]
   
-  message(paste(
-    "Filtered", length(fastafile) - length(filtered),
-    "sequences with >", N_filter, "N bases"
-  ))
+  # FIX: was message(paste(...)); message() concatenates natively
+  message(
+    "Filtered ", length(fastafile) - length(filtered),
+    " sequences with >", N_filter, " N bases"
+  )
   
   return(filtered)
 }
@@ -207,7 +213,8 @@ fastafile_new <- function(fastafile, N_filter) {
 #' @param fastafile List. A list of DNA sequences read by seqinr::read.fasta()
 #' @param N_filter Integer. N filter threshold (for reference in output)
 #'
-#' @return data.frame. A data frame with columns: name, length, GC_content, N_content
+#' @return data.frame. A data frame with columns: name, length, GC_content,
+#'   N_content
 #'
 #' @details
 #' This function provides useful summary statistics for quality control and
@@ -220,7 +227,7 @@ fastafile_new <- function(fastafile, N_filter) {
 #'     seq2 = "GCTAGCTAGCTA",
 #'     seq3 = "AAAATTTTCCCCGGGG"
 #' )
-#' 
+#'
 #' # Get metadata
 #' meta <- create_meta(test_seqs, N_filter = 50)
 #' print(meta)
@@ -229,17 +236,17 @@ fastafile_new <- function(fastafile, N_filter) {
 create_meta <- function(fastafile, N_filter) {
   meta_df <- data.frame(
     name = names(fastafile),
-    length = sapply(fastafile, nchar),
-    GC_content = sapply(fastafile, function(seq) {
+    # FIX: all three were sapply(); vapply() enforces return type per call
+    length = vapply(fastafile, nchar, FUN.VALUE = integer(1)),
+    GC_content = vapply(fastafile, function(seq) {
       bases <- strsplit(toupper(seq), "")[[1]]
       gc_count <- sum(bases %in% c("G", "C"))
       gc_count / length(bases) * 100
-    }),
-    N_content = sapply(fastafile, function(seq) {
+    }, FUN.VALUE = numeric(1)),
+    N_content = vapply(fastafile, function(seq) {
       bases <- strsplit(toupper(seq), "")[[1]]
-      n_count <- sum(bases == "N")
-      n_count
-    }),
+      as.integer(sum(bases == "N"))
+    }, FUN.VALUE = integer(1)),
     stringsAsFactors = FALSE
   )
   

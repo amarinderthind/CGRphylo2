@@ -7,8 +7,8 @@
 calculateDistanceMatrix(freq_matrices, distance_type = "Euclidean")
 }
 \arguments{
-\item{freq_matrices}{List. A named list of frequency matrices, one per sequence,
-as returned by cgat().}
+\item{freq_matrices}{List. A named list of frequency matrices, one per
+sequence, as returned by cgat().}
 
 \item{distance_type}{Character. Type of distance to calculate:
 "Euclidean" (default), "S_Euclidean", or "Manhattan".}
@@ -18,7 +18,8 @@ Numeric matrix. A symmetric distance matrix with sequence names as
   row and column names.
 }
 \description{
-Computes a full pairwise distance matrix from a list of CGR frequency matrices.
+Computes a full pairwise distance matrix from a list of CGR frequency
+matrices.
 }
 \details{
 This function calculates all pairwise distances between sequences based on
@@ -26,11 +27,17 @@ their CGR frequency matrices. The resulting distance matrix can be used for
 phylogenetic tree construction, clustering, or other downstream analyses.
 }
 \examples{
-\dontrun{
-# Assuming freq_matrices is a list of frequency matrices
-dist_matrix <- calculateDistanceMatrix(freq_matrices,
-  distance_type = "Euclidean"
-)
-}
+# Build two minimal frequency matrices (4 k-mers each, normalized)
+fm1 <- matrix(c(0.4, 0.3, 0.2, 0.1), ncol = 1,
+              dimnames = list(c("A", "C", "G", "T"), NULL))
+fm2 <- matrix(c(0.1, 0.2, 0.3, 0.4), ncol = 1,
+              dimnames = list(c("A", "C", "G", "T"), NULL))
+fm3 <- matrix(c(0.25, 0.25, 0.25, 0.25), ncol = 1,
+              dimnames = list(c("A", "C", "G", "T"), NULL))
+
+freq_list <- list(Seq1 = fm1, Seq2 = fm2, Seq3 = fm3)
+
+dist_matrix <- calculateDistanceMatrix(freq_list, distance_type = "Euclidean")
+print(round(dist_matrix, 4))
 
 }

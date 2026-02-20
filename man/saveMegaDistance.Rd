@@ -20,18 +20,25 @@ Exports a distance matrix to MEGA format for use with MEGA software for
 phylogenetic tree visualization and analysis.
 }
 \details{
-MEGA (Molecular Evolutionary Genetics Analysis) is widely used for phylogenetic
-analysis. This function creates a distance matrix file compatible with MEGA's
-format specifications.
+MEGA (Molecular Evolutionary Genetics Analysis) is widely used for
+phylogenetic analysis. This function creates a distance matrix file
+compatible with MEGA's format specifications.
 }
 \examples{
-\dontrun{
-# Create a distance matrix
-dist_mat <- matrix(runif(9), nrow = 3)
+# Build a small symmetric distance matrix
+dist_mat <- matrix(
+    c(0.00, 0.12, 0.25,
+      0.12, 0.00, 0.18,
+      0.25, 0.18, 0.00),
+    nrow = 3
+)
 rownames(dist_mat) <- colnames(dist_mat) <- c("Seq1", "Seq2", "Seq3")
 
-# Save in MEGA format
-saveMegaDistance("distances.meg", dist_mat)
-}
+# Save to a temporary file (no permanent files written during checks)
+out <- tempfile(fileext = ".meg")
+saveMegaDistance(out, dist_mat)
+
+# Inspect the first few lines of the output
+writeLines(readLines(out, n = 8))
 
 }

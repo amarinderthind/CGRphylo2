@@ -7,14 +7,15 @@
 parallelCGR(sequences, k_mer, len_trim, num_cores = NULL)
 }
 \arguments{
-\item{sequences}{List. A list of DNA sequences (from fastafile_new or similar).}
+\item{sequences}{List. A list of DNA sequences (from fastafile_new or
+similar).}
 
 \item{k_mer}{Integer. The k-mer size for frequency calculation.}
 
 \item{len_trim}{Integer. Length to trim all sequences to.}
 
 \item{num_cores}{Integer. Number of CPU cores to use. If NULL, uses
-detectCores() - 1.}
+detectCores() - 1. Always set to 1 inside vignettes and examples.}
 }
 \value{
 Named list. A list of frequency matrices, one per sequence.
@@ -29,14 +30,20 @@ frequency matrices for large datasets. It automatically detects available
 cores and leaves one free to prevent system freezing.
 
 Note: On Windows, parallel processing falls back to sequential processing.
+Always pass num_cores = 1 when calling from vignettes or examples to comply
+with CRAN/Bioconductor check policies.
 }
 \examples{
-\dontrun{
-library(seqinr)
-fasta <- read.fasta("sequences.fasta", seqtype = "DNA", as.string = TRUE)
-filtered <- fastafile_new(fasta, N_filter = 50)
+# Small synthetic sequences — num_cores = 1 required in checked examples
+seqs <- list(
+    Seq1 = "ATCGATCGATCGATCGATCG",
+    Seq2 = "GCTAGCTAGCTAGCTAGCTA"
+)
+assign("fasta_filtered", seqs, envir = .GlobalEnv)
 
-freq_mats <- parallelCGR(filtered, k_mer = 6, len_trim = 29000)
-}
+freq_mats <- parallelCGR(seqs, k_mer = 2, len_trim = 20, num_cores = 1)
+cat("Matrices computed:", length(freq_mats), "\n")
+
+rm(fasta_filtered, envir = .GlobalEnv)
 
 }

@@ -12,7 +12,8 @@ create_meta(fastafile, N_filter)
 \item{N_filter}{Integer. N filter threshold (for reference in output)}
 }
 \value{
-data.frame. A data frame with columns: name, length, GC_content, N_content
+data.frame. A data frame with columns: name, length, GC_content,
+  N_content
 }
 \description{
 Extracts and compiles metadata including sequence length, GC content, and

@@ -14,8 +14,9 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
-  echo = TRUE, warning = FALSE, message = FALSE,
-  fig.width = 7, fig.height = 5
+    echo = TRUE, warning = FALSE, message = FALSE,
+    fig.width = 7, fig.height = 5,
+    fig.crop = FALSE   ## avoids magick dependency during R CMD check
 )
 ```
 
@@ -24,40 +25,44 @@ knitr::opts_chunk$set(
 ### About CGRphylo2
 
 CGRphylo2 provides an alignment-free phylogenetic analysis method
-    for viral genomes using Chaos Game Representation (CGR), a technique based
-    on statistical physics concepts. Viruses exhibit high mutation rates,
-    facilitating rapid evolution and emergence of new species, subspecies,
-    strains, and recombinant forms. Accurate classification is crucial for
-    understanding viral evolution and therapeutic development. Traditional
-    phylogenetic methods require sequence alignment, which is computationally
-    intensive. CGRphylo2 addresses this by implementing CGR-based whole-genome
-    comparison that is fast, accurate, and computationally efficient. The
-    package successfully classifies closely related viral lineages (demonstrated
-    on SARS-CoV-2 lineages A and B), identifies recombinants (such as the XBB
-    variant), and distinguishes multiple strains simultaneously. It processes
-    sequences 5-13.7x faster than alignment-based methods (Clustal-Omega) with
-    linear computational scaling. As a k-mer based approach, it enables
-    simultaneous comparison of numerous closely-related sequences of different
-    lengths. The package creates frequency matrices for distance calculations
-    and phylogenetic tree construction, with outputs compatible with standard
-    formats (MEGA, PHYLIP, Newick). Earlier version refernce is Thind and Sinha (2023)
-    <doi:10.2174/1389202924666230517115655>.
-    
+for viral genomes using Chaos Game Representation (CGR), a technique based
+on statistical physics concepts. Viruses exhibit high mutation rates,
+facilitating rapid evolution and emergence of new species, subspecies,
+strains, and recombinant forms. Accurate classification is crucial for
+understanding viral evolution and therapeutic development. Traditional
+phylogenetic methods require sequence alignment, which is computationally
+intensive. CGRphylo2 addresses this by implementing CGR-based whole-genome
+comparison that is fast, accurate, and computationally efficient. The package
+successfully classifies closely related viral lineages (demonstrated on
+SARS-CoV-2 lineages A and B), identifies recombinants (such as the XBB
+variant), and distinguishes multiple strains simultaneously. It processes
+sequences 5-13.7x faster than alignment-based methods (Clustal-Omega) with
+linear computational scaling. As a k-mer based approach, it enables
+simultaneous comparison of numerous closely-related sequences of different
+lengths. The package creates frequency matrices for distance calculations
+and phylogenetic tree construction, with outputs compatible with standard
+formats (MEGA, PHYLIP, Newick). Earlier version reference is Thind and
+Sinha (2023) <doi:10.2174/1389202924666230517115655>.
+
 ## Why CGRphylo?
 
-**CGRphylo2** provides an efficient alignment-free approach for phylogenetic analysis of viral genomes using Chaos Game Representation (CGR). The package offers several key advantages:
+**CGRphylo2** provides an efficient alignment-free approach for phylogenetic
+analysis of viral genomes using Chaos Game Representation (CGR). The package
+offers several key advantages:
 
-- ✨ **Precision**: Accurately classifies closely related viral strains and recombinants
-- ✨ **Speed**: 5-13.7× faster than traditional alignment methods like Clustal-Omega
-- ✨ **Scalability**: Linear computational cost with dataset size
-- ✨ **Accessibility**: Designed for both high and low-resource settings
+- **Precision**: Accurately classifies closely related viral strains and
+  recombinants
+- **Speed**: 5-13.7x faster than traditional alignment methods like
+  Clustal-Omega
+- **Scalability**: Linear computational cost with dataset size
+- **Accessibility**: Designed for both high and low-resource settings
 
 ## Computational Efficiency
 
 CGRphylo's efficiency comes from its alignment-free approach:
 
-- For 69 SARS-CoV-2 genomes: **5× faster** than Clustal-Omega
-- For 106 genomes: **13.7× faster** than Clustal-Omega
+- For 69 SARS-CoV-2 genomes: **5x faster** than Clustal-Omega
+- For 106 genomes: **13.7x faster** than Clustal-Omega
 - Adding sequences requires just one frequency matrix calculation
 - No quadratic scaling issues like multiple sequence alignment
 
@@ -65,9 +70,10 @@ CGRphylo's efficiency comes from its alignment-free approach:
 
 If you use CGRphylo in your research, please cite:
 
-> Thind AS, Sinha S (2023). Using Chaos-Game-Representation for Analysing the 
-> SARS-CoV-2 Lineages, Newly Emerging Strains and Recombinants. *Current Genomics*, 
-> 24(3). [doi:10.2174/1389202924666230517115655](https://doi.org/10.2174/1389202924666230517115655)
+> Thind AS, Sinha S (2023). Using Chaos-Game-Representation for Analysing the
+> SARS-CoV-2 Lineages, Newly Emerging Strains and Recombinants.
+> *Current Genomics*, 24(3).
+> [doi:10.2174/1389202924666230517115655](https://doi.org/10.2174/1389202924666230517115655)
 
 # Installation
 
@@ -75,229 +81,288 @@ If you use CGRphylo in your research, please cite:
 
 ```{r eval=FALSE}
 if (!require("BiocManager", quietly = TRUE)) {
-  install.packages("BiocManager")
+    install.packages("BiocManager")
 }
-
 BiocManager::install("CGRphylo2")
 ```
 
 ## Development Version
 
 ```{r eval=FALSE}
-# Install from GitHub
+ 
 if (!require("devtools", quietly = TRUE)) {
-  install.packages("devtools")
+    install.packages("devtools")
 }
-
 devtools::install_github("amarinderthind/CGRphylo2")
 ```
 
 # Quick Start Example
 
-This example demonstrates the complete CGRphylo workflow using SARS-CoV-2 sequences.
+This example demonstrates the complete CGRphylo2 workflow using six synthetic
+DNA sequences (three AT-rich, three GC-rich) so that all steps run and
+produce visible output when the vignette is built.
 
 ## Load Required Packages
 
-```{r load_packages, eval=FALSE}
+```{r load_packages}
 library(CGRphylo2)
-library(seqinr)
 library(ape)
 ```
 
-## Load and Filter Sequences
+## Prepare Example Sequences
 
-```{r load_data, eval=FALSE}
-# Read FASTA file
-fastafile <- seqinr::read.fasta("example_sequences.fasta",
-  seqtype = "DNA",
-  as.string = TRUE,
-  set.attributes = FALSE
+We create six 200 bp synthetic sequences in two compositional groups. This
+avoids any dependency on external files during the build. 
+
+```{r load_data}
+
+## ── To use your own FASTA file, uncomment the block below ────────────────────
+##
+# library(seqinr)
+# fastafile <- seqinr::read.fasta(
+#     system.file("extdata", "example_sequences.fasta", package = "CGRphylo2"),
+#     seqtype = "DNA", as.string = TRUE, set.attributes = FALSE
+# )
+# N_filter       <- 50
+# fasta_filtered <- fastafile_new(fastafile, N_filter)
+
+## ────────────────────────────────────────────────────────────────────────────
+
+
+
+## Synthetic sequences used for vignette build (no external file required).
+## Delete this block if you uncomment the FASTA loader above.
+
+set.seed(42)
+make_seq <- function(n, prob) {
+    paste(sample(c("A", "T", "C", "G"), n,
+        replace = TRUE, prob = prob
+    ), collapse = "")
+}
+
+## Group A: AT-rich  |  Group B: GC-rich
+fasta_filtered <- list(
+    A1 = make_seq(5000, c(0.35, 0.35, 0.15, 0.15)),
+    A2 = make_seq(5000, c(0.33, 0.37, 0.15, 0.15)),
+    A3 = make_seq(5000, c(0.36, 0.34, 0.14, 0.16)),
+    B1 = make_seq(5000, c(0.15, 0.15, 0.35, 0.35)),
+    B2 = make_seq(5000, c(0.14, 0.16, 0.33, 0.37)),
+    B3 = make_seq(5000, c(0.15, 0.15, 0.36, 0.34))
 )
 
-# Filter sequences with too many N bases
-N_filter <- 50 #based on 30k bases genome
-fasta_filtered <- fastafile_new(fastafile, N_filter)
+## Show first 60 characters of each sequence
+for (nm in names(fasta_filtered)) {
+    cat(nm, ":", substr(fasta_filtered[[nm]], 1, 60), "...\n")
+}
+```
 
-# Create metadata
-meta <- create_meta(fasta_filtered, N_filter)
+## Sequence Quality Control
+
+```{r metadata, fig.cap="Sequence lengths (left) and GC content (right) for the six example sequences. Group A is AT-rich (~30 percent GC) and Group B is GC-rich (~70 percent GC)."}
+meta <- create_meta(fasta_filtered, N_filter = 50)
 print(meta)
+
+par(mfrow = c(1, 2), mar = c(4, 6, 3, 1))
+
+dotchart(meta$length,
+    labels = meta$name, xlab = "Sequence length (bp)",
+    pch = 21, bg = "green", pt.cex = 1.4, cex = 0.9,
+    main = "Sequence Lengths"
+)
+dotchart(meta$GC_content,
+    labels = meta$name, xlab = "GC content (%)",
+    pch = 21, bg = "steelblue", pt.cex = 1.4, cex = 0.9,
+    main = "GC Content"
+)
+par(mfrow = c(1, 1))
 ```
 
 ## Calculate CGR Frequency Matrices
 
-The k-mer size determines the resolution of the analysis. Typical values are 4-8.
+The k-mer size determines the resolution of the analysis. Typical values for
+real genome data are 4-8; we use k=3 here so the vignette builds quickly.
 
-```{r calculate_frequencies, eval=FALSE}
-k_mer <- 6
-len_trim <- min(meta$length)
+```{r calculate_frequencies}
+ 
+k_mer    <- 4   ## use 6 for real genome-scale data (virus) ~30k bp
+len_trim <- min(nchar(unlist(fasta_filtered)))
 
-# Parallel processing (recommended for large datasets)
+## num_cores=1 required in vignettes — R CMD check forbids >2 parallel processes
 freq_matrices <- parallelCGR(fasta_filtered,
-  k_mer = k_mer,
-  len_trim = len_trim
+    k_mer      = k_mer,
+    len_trim   = len_trim,
+    num_cores  = 1
 )
+
+cat("Sequences processed:", length(freq_matrices), "\n")
+cat("K-mers per matrix  :", nrow(freq_matrices[[1]]),
+    paste0("(4^", k_mer, ")"), "\n")
+```
+
+## CGR Visualization
+
+```{r cgr_plots, fig.cap="CGR plots for an AT-rich sequence (A1, blue) and a GC-rich sequence (B1, red). The two groups show clearly different density patterns."}
+ 
+par(mfrow = c(1, 2), mar = c(2, 2, 3, 1))
+
+cgr1 <- cgrplot(1)
+plot(cgr1[, 1], cgr1[, 2],
+    main = paste("CGR:", names(fasta_filtered)[1]),
+    xlab = "", ylab = "", cex = 0.4, pch = 4, col = "blue"
+)
+
+cgr2 <- cgrplot(4)
+plot(cgr2[, 1], cgr2[, 2],
+    main = paste("CGR:", names(fasta_filtered)[4]),
+    xlab = "", ylab = "", cex = 0.4, pch = 4, col = "red"
+)
+par(mfrow = c(1, 1))
 ```
 
 ## Calculate Distance Matrix
 
-```{r calculate_distances, eval=FALSE}
-# Calculate pairwise distances
+```{r calculate_distances}
+ 
 distance_matrix <- calculateDistanceMatrix(freq_matrices,
-  distance_type = "Euclidean"
+    distance_type = "Euclidean"
 )
-
-# View a subset
-print(distance_matrix[1:5, 1:5])
+print(round(distance_matrix, 4))
 ```
 
-## Export Results
+## Distance Matrix Heatmap
 
-```{r export_results, eval=FALSE}
-# Save in MEGA format
-saveMegaDistance("distances.meg", distance_matrix)
+```{r heatmap, fig.cap="Pairwise Euclidean distance matrix. Lighter colours indicate smaller distances (more similar sequences). Group A and Group B sequences cluster within their own groups."}
+col_pal <- colorRampPalette(c("white", "steelblue", "darkblue"))(50)
+n       <- nrow(distance_matrix)
 
-# Save in PHYLIP format (relaxed)
-savePhylipDistance("distances.phy", distance_matrix, mode = "relaxed")
+image(seq_len(n), seq_len(n), distance_matrix,
+    col  = col_pal, xaxt = "n", yaxt = "n",
+    xlab = "", ylab = "",
+    main = "Pairwise Distance Heatmap"
+)
+axis(1, at = seq_len(n), labels = rownames(distance_matrix),
+    las = 2, cex.axis = 0.9)
+axis(2, at = seq_len(n), labels = colnames(distance_matrix),
+    las = 1, cex.axis = 0.9)
+for (i in seq_len(n)) {
+    for (j in seq_len(n)) {
+        text(i, j, round(distance_matrix[i, j], 3), cex = 0.75)
+    }
+}
 ```
 
 ## Build Phylogenetic Tree
 
-```{r build_tree, eval=FALSE}
-library(ape)
+```{r build_tree, fig.cap="Neighbour-joining tree built from CGR Euclidean distances. Blue tips = AT-rich (Group A), red tips = GC-rich (Group B)."}
+ 
+nj_tree    <- nj(as.dist(distance_matrix))
+tip_colors <- ifelse(grepl("^A", nj_tree$tip.label), "blue", "red")
 
-# Create neighbor-joining tree
-nj_tree <- nj(as.dist(distance_matrix))
+plot(nj_tree,
+    tip.color = tip_colors,
+    main      = "Neighbour-Joining Tree (CGR distances)",
+    cex       = 1.1
+)
+legend("bottomleft",
+    legend = c("Group A (AT-rich)", "Group B (GC-rich)"),
+    col    = c("blue", "red"), pch = 19, bty = "n"
+)
+```
 
-# Save tree
-write.tree(nj_tree, file = "tree.nwk")
-write.nexus(nj_tree, file = "tree.nex")
+## Export Results
 
-# Plot tree
-plot(nj_tree, main = "Neighbor-Joining Tree", cex = 0.8)
+```{r export_results}
+ 
+mega_file   <- tempfile(fileext = ".meg")
+phylip_file <- tempfile(fileext = ".phy")
+
+saveMegaDistance(mega_file, distance_matrix)
+savePhylipDistance(phylip_file, distance_matrix, mode = "relaxed")
+
+cat("--- MEGA file (first 6 lines) ---\n")
+writeLines(readLines(mega_file, n = 6))
+
+cat("\n--- PHYLIP file (first 6 lines) ---\n")
+writeLines(readLines(phylip_file, n = 6))
 ```
 
 # Detailed Workflow
 
 ## 1. Data Preparation
 
-### Quality Control
+For real data, replace the inline sequences above with:
 
-Examine sequence characteristics before analysis:
-
-```{r quality_control, eval=FALSE}
-# Check sequence lengths
-print(paste("Median length:", median(meta$length)))
-print(paste("SD length:", sd(meta$length)))
-print(paste("Range:", paste(range(meta$length), collapse = " - ")))
-
-# Visualize length distribution
-dotchart(meta$length,
-  labels = meta$name,
-  xlab = "Sequence length",
-  pch = 21, bg = "green", pt.cex = 1, cex = 0.7
+```{r real_data_loading, eval=FALSE}
+library(seqinr)
+fastafile <- seqinr::read.fasta("my_sequences.fasta",
+    seqtype        = "DNA",
+    as.string      = TRUE,
+    set.attributes = FALSE
 )
-
-# Check GC content
-dotchart(meta$GC_content,
-  labels = meta$name,
-  xlab = "GC content (%)",
-  pch = 21, bg = "blue", pt.cex = 1, cex = 0.7
-)
+N_filter       <- 50
+fasta_filtered <- fastafile_new(fastafile, N_filter)
+meta           <- create_meta(fasta_filtered, N_filter)
+len_trim       <- min(meta$length)
 ```
 
-### Filtering by Strain (Optional)
+## 2. Distance Calculation Methods
 
-```{r strain_filtering, eval=FALSE}
-library(ggplot2)
+CGRphylo2 supports three distance metrics:
 
-# Extract strain names (assuming format: STRAIN_ID)
-meta$strains <- sapply(strsplit(meta$name, "_"), `[`, 1)
-
-# Visualize by strain
-ggplot(meta, aes(x = strains, y = length, color = strains)) +
-  geom_boxplot() +
-  coord_flip() +
-  ylab("Sequence length") +
-  theme_minimal()
-```
-
-## 2. CGR Visualization
-
-Visualize the Chaos Game Representation for individual sequences:
-
-```{r cgr_plots, eval=FALSE}
-# Single CGR plot
-cgr_coords <- cgrplot(1)
-plot(cgr_coords[, 1], cgr_coords[, 2],
-  main = paste("CGR of", names(fasta_filtered)[1]),
-  xlab = "", ylab = "",
-  cex = 0.2, pch = 4
-)
-
-# Compare two sequences
-par(mfrow = c(1, 2))
-cgr1 <- cgrplot(1)
-cgr2 <- cgrplot(2)
-
-plot(cgr1[, 1], cgr1[, 2],
-  main = names(fasta_filtered)[1],
-  cex = 0.3, pch = 4, col = "blue"
-)
-
-plot(cgr2[, 1], cgr2[, 2],
-  main = names(fasta_filtered)[2],
-  cex = 0.3, pch = 4, col = "red"
-)
-```
-
-## 3. Distance Calculation Methods
-
-CGRphylo supports multiple distance metrics:
-
-```{r distance_methods, eval=FALSE}
-# Euclidean distance (default, recommended)
-dist_euclidean <- calculateDistanceMatrix(freq_matrices,
-  distance_type = "Euclidean"
-)
-
-# Manhattan distance
-dist_manhattan <- calculateDistanceMatrix(freq_matrices,
-  distance_type = "Manhattan"
-)
-
-# Squared Euclidean distance
-dist_sq_euclidean <- calculateDistanceMatrix(freq_matrices,
-  distance_type = "S_Euclidean"
-)
-```
-
-## 4. Choosing K-mer Size
-
-Different k-mer sizes can reveal different phylogenetic relationships:
-
-```{r kmer_comparison, eval=FALSE}
-# Test multiple k-mer values
-k_values <- c(4, 5, 6, 7)
-trees <- list()
-
-for (k in k_values) {
-  # Calculate frequencies
-  freq <- parallelCGR(fasta_filtered, k_mer = k, len_trim = len_trim)
-
-  # Calculate distances
-  dist <- calculateDistanceMatrix(freq, distance_type = "Euclidean")
-
-  # Build tree
-  trees[[paste0("k", k)]] <- nj(as.dist(dist))
+```{r distance_methods, fig.cap="NJ trees using three distance metrics. All three correctly separate the two sequence groups."}
+par(mfrow = c(1, 3), mar = c(1, 1, 3, 1))
+for (dtype in c("Euclidean", "Manhattan", "S_Euclidean")) {
+    dist_d   <- calculateDistanceMatrix(freq_matrices, distance_type = dtype)
+    tree_d   <- nj(as.dist(dist_d))
+    tip_cols <- ifelse(grepl("^A", tree_d$tip.label), "blue", "red")
+    plot(tree_d, tip.color = tip_cols, main = dtype, cex = 0.95)
 }
+par(mfrow = c(1, 1))
+```
 
-# Compare trees
-par(mfrow = c(2, 2))
-for (k in k_values) {
-  plot(trees[[paste0("k", k)]],
-    main = paste("k =", k),
-    cex = 0.7
-  )
+## 3. Choosing K-mer Size
+
+```{r kmer_comparison, fig.cap="NJ trees at k = 2, 3, and 4. All k values correctly separate the two groups."}
+par(mfrow = c(1, 3), mar = c(1, 1, 3, 1))
+for (k in c(2, 3, 4)) {
+    freq_k   <- parallelCGR(fasta_filtered, k_mer = k, len_trim = len_trim,
+                            num_cores = 1)   ## num_cores=1 required in vignettes
+    dist_k   <- calculateDistanceMatrix(freq_k, distance_type = "Euclidean")
+    tree_k   <- nj(as.dist(dist_k))
+    tip_cols <- ifelse(grepl("^A", tree_k$tip.label), "blue", "red")
+    plot(tree_k, tip.color = tip_cols,
+        main = paste0("k = ", k), cex = 0.95)
+}
+par(mfrow = c(1, 1))
+```
+
+## 4. Parallel Processing
+
+```{r parallel_processing, eval=TRUE}
+freq_matrices <- parallelCGR(fasta_filtered,
+    k_mer     = 6,
+    len_trim  = len_trim,
+    num_cores = 1   ## uses detectCores() - 1
+)
+
+dim(freq_matrices[1])
+
+```
+
+## 5. Memory Optimisation for Very Large Datasets
+
+```{r memory_optimization, eval=FALSE}
+batch_size        <- 100
+n_sequences       <- length(fasta_filtered)
+n_batches         <- ceiling(n_sequences / batch_size)
+all_freq_matrices <- list()
+
+for (i in seq_len(n_batches)) {
+    start_idx         <- (i - 1) * batch_size + 1
+    end_idx           <- min(i * batch_size, n_sequences)
+    batch_seqs        <- fasta_filtered[start_idx:end_idx]
+    batch_freq        <- parallelCGR(batch_seqs, k_mer = 6, len_trim = len_trim)
+    all_freq_matrices <- c(all_freq_matrices, batch_freq)
 }
 ```
 
@@ -307,122 +372,45 @@ for (k in k_values) {
 
 Chaos Game Representation creates a 2D fractal representation of DNA sequences:
 
-1. **Initialize**: Start at center of unit square (0.5, 0.5)
-2. **Iterate**: For each nucleotide:
-   - Move halfway toward the corner representing that base
-   - A → (0,0), C → (1,0), G → (1,1), T → (0,1)
-3. **Result**: Each sequence creates a unique pattern
+1. **Initialise**: Start at centre of unit square (0.5, 0.5)
+2. **Iterate**: For each nucleotide, move halfway toward its corner —
+   A: (0,0), C: (1,0), G: (1,1), T: (0,1)
+3. **Result**: Each sequence creates a unique compositional fingerprint
 
 ## K-mer Frequencies
 
-The frequency matrix captures k-mer composition:
-
-- **4^k possible k-mers**: For k=6, there are 4,096 possible 6-mers
-- **Normalized frequencies**: Each k-mer frequency is divided by total count
-- **Scale-invariant**: Robust to sequence length differences
+- **4^k possible k-mers**: k=6 gives 4,096 possible 6-mers
+- **Normalised frequencies**: each count divided by total k-mer count
+- **Scale-invariant**: robust to sequence length differences
 
 ## Distance Metrics
 
-- **Euclidean**: √(Σ(f1 - f2)²) - Standard choice, balanced
-- **Manhattan**: Σ|f1 - f2| - More sensitive to small differences
-- **Squared Euclidean**: Σ(f1 - f2)² - Amplifies large differences
-
-# Advanced Topics
-
-## Parallel Processing
-
-For large datasets, use parallel processing:
-
-```{r parallel_processing, eval=FALSE}
-# Automatic core detection
-freq_matrices <- parallelCGR(fasta_filtered,
-  k_mer = 6,
-  len_trim = len_trim,
-  num_cores = NULL
-) # Uses detectCores() - 1
-
-# Manual core specification
-freq_matrices <- parallelCGR(fasta_filtered,
-  k_mer = 6,
-  len_trim = len_trim,
-  num_cores = 4
-)
-```
-
-## Memory Optimization
-
-For very large datasets:
-
-```{r memory_optimization, eval=FALSE}
-# Process in batches
-batch_size <- 100
-n_sequences <- length(fasta_filtered)
-n_batches <- ceiling(n_sequences / batch_size)
-
-all_freq_matrices <- list()
-
-for (i in seq_len(n_batches)) {
-  start_idx <- (i - 1) * batch_size + 1
-  end_idx <- min(i * batch_size, n_sequences)
-
-  batch_seqs <- fasta_filtered[start_idx:end_idx]
-  batch_freq <- parallelCGR(batch_seqs, k_mer = 6, len_trim = len_trim)
-
-  all_freq_matrices <- c(all_freq_matrices, batch_freq)
-}
-```
-
-## Integration with Other Tools
-
-CGRphylo outputs are compatible with standard phylogenetic software:
-
-- **MEGA**: Use `.meg` files
-- **PHYLIP**: Use `.phy` files  
-- **TreeView, FigTree**: Use `.nwk` or `.nex` files
-- **R packages** (ape, phangorn, ggtree): Use distance matrices directly
+- **Euclidean**: sqrt(sum((f1-f2)^2)) — standard choice, balanced
+- **Manhattan**: sum(|f1-f2|) — more sensitive to small differences
+- **Squared Euclidean**: sum((f1-f2)^2) — amplifies large differences
 
 # Performance Benchmarks
 
-## Speed Comparison
-
-Approximate processing times for SARS-CoV-2 genomes (~30kb):
-
 | Method | 69 sequences | 106 sequences |
-|--------|--------------|---------------|
+|--------|-------------|--------------|
 | Clustal-Omega | 5 minutes | 13.7 minutes |
 | CGRphylo (k=6) | 1 minute | 1 minute |
-| **Speedup** | **5×** | **13.7×** |
+| **Speedup** | **5x** | **13.7x** |
 
-## Memory Usage
-
-CGRphylo is memory-efficient:
-
-- Each frequency matrix: ~32 KB (k=6)
-- 100 sequences: ~3.2 MB
-- 1000 sequences: ~32 MB
+Memory usage scales linearly: each frequency matrix at k=6 is ~32 KB, so
+1,000 sequences require ~32 MB.
 
 # Troubleshooting
 
-## Common Issues
+## Out of Memory
+Process sequences in batches (see Memory Optimisation above).
 
-### Issue: Out of Memory
+## Slow Performance
+Use `parallelCGR`, reduce k-mer size, or filter low-quality sequences first.
 
-**Solution**: Process sequences in batches (see Memory Optimization)
-
-### Issue: Slow Performance
-
-**Solutions**:
-- Use parallel processing (`parallelCGR`)
-- Reduce k-mer size
-- Filter low-quality sequences first
-
-### Issue: Tree Topology Differs from MSA
-
-**Explanation**: CGRphylo captures different signal than MSA:
-- MSA: Position-specific mutations
-- CGR: Compositional patterns
-
-Both are valid but emphasize different aspects of evolution.
+## Tree Topology Differs from MSA
+CGRphylo captures compositional patterns; MSA captures position-specific
+mutations. Both are valid but emphasise different evolutionary signals.
 
 # Session Information
 
@@ -432,13 +420,13 @@ sessionInfo()
 
 # References
 
-1. Thind AS, Sinha S (2023). Using Chaos-Game-Representation for Analysing the 
-   SARS-CoV-2 Lineages, Newly Emerging Strains and Recombinants. 
+1. Thind AS, Sinha S (2023). Using Chaos-Game-Representation for Analysing
+   the SARS-CoV-2 Lineages, Newly Emerging Strains and Recombinants.
    *Current Genomics*, 24(3).
 
-2. Jeffrey HJ (1990). Chaos game representation of gene structure. 
+2. Jeffrey HJ (1990). Chaos game representation of gene structure.
    *Nucleic Acids Research*, 18(8):2163-2170.
 
-3. Deschavanne PJ, et al. (1999). Genomic signature: characterization and 
-   classification of species assessed by chaos game representation of sequences. 
-   *Molecular Biology and Evolution*, 16(10):1391-1399.
+3. Deschavanne PJ, et al. (1999). Genomic signature: characterization and
+   classification of species assessed by chaos game representation of
+   sequences. *Molecular Biology and Evolution*, 16(10):1391-1399.

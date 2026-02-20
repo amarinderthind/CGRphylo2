@@ -7,10 +7,11 @@
 savePhylipDistance(filename, distance_matrix, mode = "relaxed")
 }
 \arguments{
-\item{filename}{Character. Output filename (typically .txt or .phy extension).}
+\item{filename}{Character. Output filename (typically .txt or .phy
+extension).}
 
-\item{distance_matrix}{Numeric matrix. A square distance matrix with row and
-column names corresponding to sequence identifiers.}
+\item{distance_matrix}{Numeric matrix. A square distance matrix with row
+and column names corresponding to sequence identifiers.}
 
 \item{mode}{Character. PHYLIP format mode:
 \itemize{
@@ -26,21 +27,30 @@ Exports a distance matrix to PHYLIP format for phylogenetic analysis with
 various bioinformatics tools.
 }
 \details{
-PHYLIP format is widely supported by phylogenetic software. The original format
-limits sequence names to 10 characters, while the relaxed format allows longer
-names. The relaxed format is recommended for modern applications.
+PHYLIP format is widely supported by phylogenetic software. The original
+format limits sequence names to 10 characters, while the relaxed format
+allows longer names. The relaxed format is recommended for modern
+applications.
 }
 \examples{
-\dontrun{
-# Create a distance matrix
-dist_mat <- matrix(runif(9), nrow = 3)
+# Build a small symmetric distance matrix
+dist_mat <- matrix(
+    c(0.00, 0.12, 0.25,
+      0.12, 0.00, 0.18,
+      0.25, 0.18, 0.00),
+    nrow = 3
+)
 rownames(dist_mat) <- colnames(dist_mat) <- c("Seq1", "Seq2", "Seq3")
 
-# Save in relaxed PHYLIP format
-savePhylipDistance("distances.phy", dist_mat, mode = "relaxed")
-}
+# Save in relaxed PHYLIP format to a temporary file
+out <- tempfile(fileext = ".phy")
+savePhylipDistance(out, dist_mat, mode = "relaxed")
+
+# Inspect output
+writeLines(readLines(out))
 
 }
 \references{
-PHYLIP format specification: http://www.phylo.org/index.php/help/relaxed_phylip
+PHYLIP format specification:
+http://www.phylo.org/index.php/help/relaxed_phylip
 }
