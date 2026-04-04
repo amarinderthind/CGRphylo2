@@ -32,17 +32,12 @@ utils::globalVariables(c("fasta_filtered"))
 #' }
 #'
 #' @examples
-#' \dontrun{
-#' # Generate CGR coordinates for first sequence
+#' assign("fasta_filtered", list(seq1 = "ATCGATCGATCGATCGATCG"), envir = .GlobalEnv)
 #' cgr_coords <- cgrplot(1)
-#'
-#' # Plot the CGR
 #' plot(cgr_coords[, 1], cgr_coords[, 2],
-#'   main = "CGR Plot",
-#'   xlab = "", ylab = "",
-#'   cex = 0.2, pch = 4
+#'     main = "CGR Plot", xlab = "", ylab = "", cex = 0.5, pch = 4
 #' )
-#' }
+#' rm(fasta_filtered, envir = .GlobalEnv)
 #'
 #' @references
 #' Jeffrey HJ (1990). Chaos game representation of gene structure.
@@ -105,13 +100,10 @@ cgrplot <- function(seq_index) {
 #' @return NULL. Creates a plot as a side effect.
 #'
 #' @examples
-#' \dontrun{
-#' # Simple CGR plot
+#' assign("fasta_filtered", list(seq1 = "ATCGATCGATCGATCGATCG"), envir = .GlobalEnv)
 #' plot_cgr(1)
-#'
-#' # Customized plot
 #' plot_cgr(1, main = "My Sequence", col = "blue", cex = 0.3)
-#' }
+#' rm(fasta_filtered, envir = .GlobalEnv)
 #'
 #' @export
 plot_cgr <- function(seq_index, main = NULL, cex = 0.2, pch = 4,

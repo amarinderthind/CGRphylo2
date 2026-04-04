@@ -25,8 +25,7 @@ A matrix containing the frequencies of all possible k-mers for the
 \description{
 This function computes the Chaos Game Representation (CGR) frequency matrix
 for a given DNA sequence at a specified k-mer length. The CGR approach is an
-alignment-free method that represents genomic sequences
- as frequency matrices,
+alignment-free method that represents genomic sequences as frequency matrices,
 which can then be used for phylogenetic analysis and sequence comparison.
 }
 \details{

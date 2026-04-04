@@ -38,17 +38,12 @@ Corner assignments (standard):
 }
 }
 \examples{
-\dontrun{
-# Generate CGR coordinates for first sequence
+assign("fasta_filtered", list(seq1 = "ATCGATCGATCGATCGATCG"), envir = .GlobalEnv)
 cgr_coords <- cgrplot(1)
-
-# Plot the CGR
 plot(cgr_coords[, 1], cgr_coords[, 2],
-  main = "CGR Plot",
-  xlab = "", ylab = "",
-  cex = 0.2, pch = 4
+    main = "CGR Plot", xlab = "", ylab = "", cex = 0.5, pch = 4
 )
-}
+rm(fasta_filtered, envir = .GlobalEnv)
 
 }
 \references{

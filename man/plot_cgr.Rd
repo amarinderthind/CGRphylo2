@@ -26,12 +26,9 @@ NULL. Creates a plot as a side effect.
 A convenience wrapper function to create a CGR plot with sensible defaults.
 }
 \examples{
-\dontrun{
-# Simple CGR plot
+assign("fasta_filtered", list(seq1 = "ATCGATCGATCGATCGATCG"), envir = .GlobalEnv)
 plot_cgr(1)
-
-# Customized plot
 plot_cgr(1, main = "My Sequence", col = "blue", cex = 0.3)
-}
+rm(fasta_filtered, envir = .GlobalEnv)
 
 }

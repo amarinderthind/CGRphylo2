@@ -288,7 +288,23 @@ writeLines(readLines(phylip_file, n = 6))
 
 # Detailed Workflow
 
-## 1. Data Preparation
+## 1. Bioconductor Integration
+
+CGRphylo2 integrates with the Bioconductor ecosystem via `from_DNAStringSet()`,
+which converts a `DNAStringSet` object to the list format used by all CGRphylo2
+functions.
+
+```{r biostrings_integration}
+library(Biostrings)
+dna <- DNAStringSet(c(
+    seq1 = "ATCGATCGATCGATCG",
+    seq2 = "GCTAGCTAGCTAGCTA"
+))
+seqs <- from_DNAStringSet(dna)
+cat("Sequences loaded:", length(seqs), "\n")
+```
+
+## 2. Data Preparation
 
 For real data, replace the inline sequences above with:
 
@@ -305,7 +321,7 @@ meta           <- create_meta(fasta_filtered, N_filter)
 len_trim       <- min(meta$length)
 ```
 
-## 2. Distance Calculation Methods
+## 3. Distance Calculation Methods
 
 CGRphylo2 supports three distance metrics:
 
@@ -320,7 +336,7 @@ for (dtype in c("Euclidean", "Manhattan", "S_Euclidean")) {
 par(mfrow = c(1, 1))
 ```
 
-## 3. Choosing K-mer Size
+## 4. Choosing K-mer Size
 
 ```{r kmer_comparison, fig.cap="NJ trees at k = 2, 3, and 4. All k values correctly separate the two groups."}
 par(mfrow = c(1, 3), mar = c(1, 1, 3, 1))
@@ -336,7 +352,7 @@ for (k in c(2, 3, 4)) {
 par(mfrow = c(1, 1))
 ```
 
-## 4. Parallel Processing
+## 5. Parallel Processing
 
 ```{r parallel_processing, eval=TRUE}
 freq_matrices <- parallelCGR(fasta_filtered,

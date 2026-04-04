@@ -249,9 +249,6 @@ calculateDistanceMatrix <- function(freq_matrices,
 #'
 #' @export
 parallelCGR <- function(sequences, k_mer, len_trim, num_cores = NULL) {
-  # Set up global environment for cgat function
-  assign("fasta_filtered", sequences, envir = .GlobalEnv)
-  
   # Determine number of cores
   if (is.null(num_cores)) {
     num_cores <- parallel::detectCores() - 1
@@ -260,14 +257,13 @@ parallelCGR <- function(sequences, k_mer, len_trim, num_cores = NULL) {
   
   seq_names <- names(sequences)
   n_seq <- length(sequences)
-  
+
   process_sequence <- function(n) {
-    cgat(k_mer, n, len_trim)
+    cgat_local(k_mer, n, len_trim, sequences)
   }
-  
-  # FIX: was message(paste(...)); message() concatenates natively
+
   message("Processing ", n_seq, " sequences using ", num_cores, " cores...")
-  
+
   # Use parallel processing on Unix-like systems, sequential on Windows
   if (.Platform$OS.type == "unix") {
     freq_matrices <- parallel::mclapply(
